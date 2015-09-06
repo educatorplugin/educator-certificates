@@ -98,10 +98,10 @@ class Edr_Crt_Main {
 		register_post_type(
 			'edr_certificate_tpl',
 			apply_filters( 'edr_cpt_certificate_tpl', array(
-				'label'              => __( 'Certificate Templates', 'ibeducator' ),
+				'label'              => __( 'Certificate Templates', 'edr-crt' ),
 				'labels'             => array(
-					'name'          => __( 'Certificate Templates', 'ibeducator' ),
-					'singular_name' => __( 'Certificate Template', 'ibeducator' ),
+					'name'          => __( 'Certificate Templates', 'edr-crt' ),
+					'singular_name' => __( 'Certificate Template', 'edr-crt' ),
 				),
 				'public'             => true,
 				'publicly_queryable' => true,
@@ -122,10 +122,10 @@ class Edr_Crt_Main {
 		register_post_type(
 			'edr_certificate',
 			apply_filters( 'edr_cpt_certificate', array(
-				'label'              => __( 'Certificates', 'ibeducator' ),
+				'label'              => __( 'Certificates', 'edr-crt' ),
 				'labels'             => array(
-					'name'          => __( 'Certificates', 'ibeducator' ),
-					'singular_name' => __( 'Certificate', 'ibeducator' ),
+					'name'          => __( 'Certificates', 'edr-crt' ),
+					'singular_name' => __( 'Certificate', 'edr-crt' ),
 				),
 				'public'             => true,
 				'publicly_queryable' => true,
@@ -157,7 +157,7 @@ class Edr_Crt_Main {
 
 			// Check permission.
 			if ( ! $certificates->can_view_certificate( $post ) ) {
-				wp_die( __( 'You are not allowed to view this page.', 'ibeducator' ) );
+				wp_die( __( 'You are not allowed to view this page.', 'edr-crt' ) );
 			}
 
 			$custom = get_post_custom( $post->ID );
@@ -206,7 +206,7 @@ class Edr_Crt_Main {
 			$user = wp_get_current_user();
 
 			if ( ! $user->ID || ! current_user_can( 'edit_edr_certificate_tpl', $post->ID ) ) {
-				wp_die( __( 'You are not allowed to view this page.', 'ibeducator' ) );
+				wp_die( __( 'You are not allowed to view this page.', 'edr-crt' ) );
 			}
 
 			$post_id = get_the_ID();
@@ -261,7 +261,7 @@ class Edr_Crt_Main {
 	 */
 	public function my_courses_heading( $headings, $status ) {
 		if ( 'complete' == $status && ! isset( $headings['actions'] ) ) {
-			$headings['actions'] = '<th>' . __( 'Actions', 'ibeducator' ) . '</th>';
+			$headings['actions'] = '<th>' . __( 'Actions', 'edr-crt' ) . '</th>';
 		}
 
 		return $headings;
@@ -280,7 +280,7 @@ class Edr_Crt_Main {
 			$certificate_url = Edr_Manager::get( 'certificates' )->get_certificate_url( $entry->ID );
 
 			if ( ! isset( $values['actions'] ) ) {
-				$values['actions'] = '<td><a href="' . esc_url( $certificate_url ) . '" target="_blank">' . __( 'View Certificate', 'ibeducator' ) . '</a></td>';
+				$values['actions'] = '<td><a href="' . esc_url( $certificate_url ) . '" target="_blank">' . __( 'View Certificate', 'edr-crt' ) . '</a></td>';
 			}
 		}
 

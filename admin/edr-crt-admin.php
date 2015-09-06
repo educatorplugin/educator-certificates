@@ -78,7 +78,7 @@ class Edr_Crt_Admin {
 		// Certificate template meta box.
 		add_meta_box(
 			'edr_certificate_tpl',
-			__( 'Certificate Template', 'ibeducator' ),
+			__( 'Certificate Template', 'edr-crt' ),
 			array( $this, 'certificate_tpl_mb' ),
 			'edr_certificate_tpl'
 		);
@@ -86,7 +86,7 @@ class Edr_Crt_Admin {
 		// Certificate template select meta box.
 		add_meta_box(
 			'edr_select_certificate_tpl',
-			__( 'Certificate Template', 'ibeducator' ),
+			__( 'Certificate Template', 'edr-crt' ),
 			array( $this, 'select_certificate_tpl_mb' ),
 			'ib_educator_course'
 		);
@@ -103,13 +103,13 @@ class Edr_Crt_Admin {
 		$blocks = get_post_meta( $post->ID, '_edr_crt_blocks', true );
 		$orientation = get_post_meta( $post->ID, '_edr_crt_orientation', true );
 		$orientations = array(
-			'P' => __( 'Portrait', 'ibeducator' ),
-			'L' => __( 'Landscape', 'ibeducator' ),
+			'P' => __( 'Portrait', 'edr-crt' ),
+			'L' => __( 'Landscape', 'edr-crt' ),
 		);
 		?>
 		<div id="edr-crt-template" class="<?php echo ( 'L' == $orientation ) ? 'landscape' : 'portrait'; ?>">
 			<p>
-				<strong><?php _e( 'Orientation', 'ibeducator' ); ?></strong>
+				<strong><?php _e( 'Orientation', 'edr-crt' ); ?></strong>
 				<select class="change-orientation" name="_edr_crt_orientation">
 					<?php
 						foreach ( $orientations as $key => $title ) {
@@ -130,7 +130,7 @@ class Edr_Crt_Admin {
 			</div>
 			<ul class="blocks"></ul>
 			<p class="buttons">
-				<button class="add-block button" data-block-type="text"><?php _e( 'Add Block', 'ibeducator' ); ?></button>
+				<button class="add-block button" data-block-type="text"><?php _e( 'Add Block', 'edr-crt' ); ?></button>
 			</p>
 		</div>
 		<script type="text/template" id="edr-text-block-tpl">
@@ -144,29 +144,29 @@ class Edr_Crt_Admin {
 			</div>
 			<div class="body">
 				<div class="name">
-					<label><?php _e( 'Name', 'ibeducator' ); ?></label>
+					<label><?php _e( 'Name', 'edr-crt' ); ?></label>
 					<input type="text" class="field-name" name="block_name[]" value="<%- name %>">
 				</div>
 				<div class="content">
-					<label><?php _e( 'Content', 'ibeducator' ); ?></label>
+					<label><?php _e( 'Content', 'edr-crt' ); ?></label>
 					<textarea class="field-content" name="block_content[]"><%- content %></textarea>
 				</div>
 				<div class="font-size">
-					<label><?php _e( 'Font Size', 'ibeducator' ); ?></label>
+					<label><?php _e( 'Font Size', 'edr-crt' ); ?></label>
 					<input type="number" class="field-font-size" name="block_font_size[]" value="<%- font_size %>">
 				</div>
 				<div class="align">
-					<label><?php _e( 'Text Alignment', 'ibeducator' ); ?></label>
+					<label><?php _e( 'Text Alignment', 'edr-crt' ); ?></label>
 
 					<select name="block_align[]" class="field-align">
-						<option value="L"><?php _e( 'Left', 'ibeducator' ); ?></option>
-						<option value="C"><?php _e( 'Center', 'ibeducator' ); ?></option>
-						<option value="R"><?php _e( 'Right', 'ibeducator' ); ?></option>
-						<option value="J"><?php _e( 'Justify', 'ibeducator' ); ?></option>
+						<option value="L"><?php _e( 'Left', 'edr-crt' ); ?></option>
+						<option value="C"><?php _e( 'Center', 'edr-crt' ); ?></option>
+						<option value="R"><?php _e( 'Right', 'edr-crt' ); ?></option>
+						<option value="J"><?php _e( 'Justify', 'edr-crt' ); ?></option>
 					</select>
 				</div>
 				<div class="edr-buttons-group">
-					<a class="remove" href="#"><?php _e( 'Remove', 'ibeducator' ); ?></a>
+					<a class="remove" href="#"><?php _e( 'Remove', 'edr-crt' ); ?></a>
 				</div>
 			</div>
 		</script>
@@ -190,7 +190,7 @@ class Edr_Crt_Admin {
 			'post_status' => 'publish',
 		) );
 		?>
-		<p><strong><?php _e( 'Certificate Template', 'ibeducator' ); ?></strong></p>
+		<p><strong><?php _e( 'Certificate Template', 'edr-crt' ); ?></strong></p>
 		<?php if ( ! empty( $templates ) ) : ?>
 			<p>
 				<select name="_edr_crt_template">
