@@ -1,0 +1,95 @@
+#edr-crt-template:after {
+	clear: both;
+	content: '';
+	display: table;
+}
+
+#edr-crt-template .image {
+	overflow: auto;
+}
+
+#edr-crt-template .image > div {
+	background: #f5f5f5;
+	height: 842px;
+	position: relative;
+	width: 595px;
+}
+
+#edr-crt-template .image img {
+	height: 100%;
+	position: absolute;
+	top: 0;
+	width: 100%;
+}
+
+#edr-crt-template .image .box {
+	background: #fff;
+	border: 2px solid #ddd;
+	text-align: center;
+	word-break: break-word;
+	z-index: 10;
+}
+
+#edr-crt-template .image .box .feedback {
+	background: #fff;
+	border: 1px solid #ddd;
+	color: #999;
+	display: block;
+	font-size: 12px;
+	line-height: 18px;
+	opacity: 0;
+	padding: 0 5px;
+	position: absolute;
+	right: -1px;
+	top: -1px;
+}
+
+#edr-crt-template .blocks,
+#edr-crt-template .buttons {
+	max-width: 842px;
+}
+
+#edr-crt-template .blocks label {
+	display: block;
+	font-weight: 600;
+	margin: 0 0 5px;
+}
+
+#edr-crt-template .content,
+#edr-crt-template .font-size,
+#edr-crt-template .align {
+	margin-top: 15px;
+}
+
+#edr-crt-template input[type="text"],
+#edr-crt-template textarea {
+	vertical-align: middle;
+	width: 100%;
+}
+
+/* Portrait */
+#edr-crt-template.portrait .image {
+	float: left;
+}
+
+#edr-crt-template.portrait .blocks,
+#edr-crt-template.portrait .buttons {
+	margin-left: 615px;
+}
+
+/* Landscape */
+#edr-crt-template.landscape .image > div {
+	height: 595px;
+	width: 842px;
+}
+
+@media (max-width: 1339px) {
+	#edr-crt-template.portrait .image {
+		float: none;
+	}
+
+	#edr-crt-template.portrait .blocks,
+	#edr-crt-template.portrait .buttons {
+		margin-left: 0;
+	}
+}
