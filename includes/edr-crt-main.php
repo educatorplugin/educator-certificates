@@ -22,7 +22,7 @@ class Edr_Crt_Main {
 		$this->plugin_dir = plugin_dir_path( $file );
 
 		register_activation_hook( $file, array( $this, 'plugin_activation' ) );
-		add_action( 'plugins_loaded', array( $this, 'synchronize' ) );
+		add_action( 'plugins_loaded', array( $this, 'on_plugins_loaded' ) );
 		add_action( 'init', array( $this, 'register_post_types' ) );
 		add_action( 'template_redirect', array( $this, 'view_certificate' ) );
 		add_action( 'edr_entry_status_change', array( $this, 'create_certificate' ), 10, 2 );
@@ -84,10 +84,14 @@ class Edr_Crt_Main {
 	}
 
 	/**
-	 * Register the Edr_Crt service with Educator.
+	 * Various processing on plugins loaded.
 	 */
-	public function synchronize() {
-		Edr_Manager::add( 'certificates', array( $this, 'get_service' ) );
+	public function on_plugins_loaded() {
+		// Load plugin text domain.
+		load_plugin_textdomain( 'edr-crt', false, 'educator-certificates/languages' );
+
+		// Register the Edr_Crt service with Educator.
+		Edr_Manager::add( 'edr_crt', array( $this, 'get_service' ) );
 	}
 
 	/**
@@ -153,10 +157,10 @@ class Edr_Crt_Main {
 		$post_type = get_post_type();
 
 		if ( 'edr_certificate' == $post_type ) {
-			$certificates = Edr_Manager::get( 'certificates' );
+			$edr_crt = Edr_Manager::get( 'edr_crt' );
 
 			// Check permission.
-			if ( ! $certificates->can_view_certificate( $post ) ) {
+			if ( ! $edr_crt->can_view_certificate( $post ) ) {
 				wp_die( __( 'You are not allowed to view this page.', 'edr-crt' ) );
 			}
 
@@ -196,7 +200,7 @@ class Edr_Crt_Main {
 							'blocks'       => $blocks,
 						);
 
-						$certificates->output_pdf( $data );
+						$edr_crt->output_pdf( $data );
 					}
 				}
 			}
@@ -229,7 +233,7 @@ class Edr_Crt_Main {
 				'blocks'       => get_post_meta( $post_id, '_edr_crt_blocks', true ),
 			);
 			
-			Edr_Manager::get( 'certificates' )->output_pdf( $data );
+			Edr_Manager::get( 'edr_crt' )->output_pdf( $data );
 
 			exit();
 		}
@@ -243,11 +247,12 @@ class Edr_Crt_Main {
 	 */
 	public function create_certificate( $entry, $prev_status ) {
 		if ( 'complete' == $entry->entry_status ) {
-			$certificates = Edr_Manager::get( 'certificates' );
+			$edr_crt = Edr_Manager::get( 'edr_crt' );
+			$certificate = $edr_crt->get_certificate_by_entry_id( $entry->ID );
 
-			// @TODO: check if certificate exists.
-
-			$certificates->create_certificate( $entry );
+			if ( is_null( $certificate ) ) {
+				$edr_crt->create_certificate( $entry );
+			}
 		}
 	}
 
@@ -277,7 +282,7 @@ class Edr_Crt_Main {
 	 */
 	public function my_courses_certificate_link( $values, $status, $entry ) {
 		if ( 'complete' == $status ) {
-			$certificate_url = Edr_Manager::get( 'certificates' )->get_certificate_url( $entry->ID );
+			$certificate_url = Edr_Manager::get( 'edr_crt' )->get_certificate_url( $entry->ID );
 
 			if ( ! isset( $values['actions'] ) ) {
 				$values['actions'] = '<td><a href="' . esc_url( $certificate_url ) . '" target="_blank">' . __( 'View Certificate', 'edr-crt' ) . '</a></td>';

@@ -81,12 +81,12 @@ class Edr_Crt {
 	}
 
 	/**
-	 * Get the certificate URL.
+	 * Get certificate by entry id.
 	 *
 	 * @param int $entry_id
-	 * @return string
+	 * @return WP_Post|null
 	 */
-	public function get_certificate_url( $entry_id ) {
+	public function get_certificate_by_entry_id( $entry_id ) {
 		$query = new WP_Query( array(
 			'post_type'      => 'edr_certificate',
 			'post_status'    => 'publish',
@@ -97,7 +97,23 @@ class Edr_Crt {
 		) );
 
 		if ( $query->have_posts() ) {
-			return get_permalink( $query->posts[0]->ID );
+			return $query->posts[0];
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get the certificate URL.
+	 *
+	 * @param int $entry_id
+	 * @return string
+	 */
+	public function get_certificate_url( $entry_id ) {
+		$certificate = $this->get_certificate_by_entry_id( $entry_id );
+
+		if ( ! is_null( $certificate ) ) {
+			return get_permalink( $certificate->ID );
 		}
 
 		return '';
