@@ -1,6 +1,14 @@
 <?php
 
+/**
+ * Certificates service.
+ */
 class Edr_Crt {
+	/**
+	 * Output the certificate PDF.
+	 *
+	 * @param array $data Certificate data.
+	 */
 	public function output_pdf( $data ) {
 		require_once dirname( __FILE__ ) . '/../lib/tfpdf/tfpdf.php';
 
@@ -46,6 +54,12 @@ class Edr_Crt {
 		$pdf->Output();
 	}
 
+	/**
+	 * Create a certificate post.
+	 *
+	 * @param IB_Educator_Entry $entry
+	 * @return int Post ID.
+	 */
 	public function create_certificate( $entry ) {
 		$unique_id = substr( md5( $entry->ID . microtime() ), rand( 0, 23 ), 10 );
 
@@ -66,6 +80,12 @@ class Edr_Crt {
 		return $crt_id;
 	}
 
+	/**
+	 * Get the certificate URL.
+	 *
+	 * @param int $entry_id
+	 * @return string
+	 */
 	public function get_certificate_url( $entry_id ) {
 		$query = new WP_Query( array(
 			'post_type'      => 'edr_certificate',
@@ -83,6 +103,12 @@ class Edr_Crt {
 		return '';
 	}
 
+	/**
+	 * Check if the current user can view a given certificate.
+	 *
+	 * @param WP_Post $certificate
+	 * @return boolean
+	 */
 	public function can_view_certificate( $certificate ) {
 		$user = wp_get_current_user();
 		$can_view = false;

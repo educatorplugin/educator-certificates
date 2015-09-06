@@ -1,8 +1,19 @@
 <?php
 
+/**
+ * Initialize the certificates admin.
+ */
 class Edr_Crt_Admin {
+	/**
+	 * @var string
+	 */
 	private $plugin_url;
 
+	/**
+	 * Constructor.
+	 *
+	 * @param string $plugin_url
+	 */
 	public function __construct( $plugin_url ) {
 		$this->plugin_url = $plugin_url;
 
@@ -12,6 +23,14 @@ class Edr_Crt_Admin {
 		add_action( 'save_post', array( $this, 'save_select_certificate_tpl_mb' ), 10 );
 	}
 
+	/**
+	 * Check if the current user can save a meta box.
+	 *
+	 * @param string $post_type
+	 * @param int $post_id
+	 * @param string $nonce_key
+	 * @return boolean
+	 */
 	public function can_save_mb_data( $post_type, $post_id, $nonce_key ) {
 		if ( ! isset( $_POST[ $nonce_key . '_nonce' ] ) ) {
 			return false;
@@ -32,10 +51,14 @@ class Edr_Crt_Admin {
 		return true;
 	}
 
+	/**
+	 * Enqueue scripts and styles.
+	 */
 	public function enqueue_scripts() {
 		$screen = get_current_screen();
 
 		if ( $screen && 'edr_certificate_tpl' == $screen->id ) {
+			// Scripts for the "edit certificate template post" page.
 			wp_enqueue_style( 'jquery-ui', $this->plugin_url . 'admin/css/jquery-ui/jquery-ui.min.css', array(), '1.11.4' );
 			wp_enqueue_style( 'edr-certificate-tpl', $this->plugin_url . 'admin/css/certificate-tpl.css', array(), '1.0' );
 			wp_enqueue_script(
@@ -48,7 +71,11 @@ class Edr_Crt_Admin {
 		}
 	}
 
+	/**
+	 * Add meta boxes.
+	 */
 	public function add_meta_boxes() {
+		// Certificate template meta box.
 		add_meta_box(
 			'edr_certificate_tpl',
 			__( 'Certificate Template', 'ibeducator' ),
@@ -56,6 +83,7 @@ class Edr_Crt_Admin {
 			'edr_certificate_tpl'
 		);
 
+		// Certificate template select meta box.
 		add_meta_box(
 			'edr_select_certificate_tpl',
 			__( 'Certificate Template', 'ibeducator' ),
@@ -64,6 +92,11 @@ class Edr_Crt_Admin {
 		);
 	}
 
+	/**
+	 * Display the certificate template meta box.
+	 *
+	 * @param WP_Post $post
+	 */
 	public function certificate_tpl_mb( $post ) {
 		wp_nonce_field( 'edr_certificate_tpl', 'edr_certificate_tpl_nonce' );
 
@@ -143,6 +176,11 @@ class Edr_Crt_Admin {
 		<?php
 	}
 
+	/**
+	 * Display the certificate template select meta box.
+	 *
+	 * @param WP_Post $post
+	 */
 	public function select_certificate_tpl_mb( $post ) {
 		wp_nonce_field( 'edr_select_certificate_tpl', 'edr_select_certificate_tpl_nonce' );
 
@@ -170,11 +208,17 @@ class Edr_Crt_Admin {
 		<?php
 	}
 
+	/**
+	 * Save the certificate template meta box.
+	 *
+	 * @param int $post_id
+	 */
 	public function save_certificate_tpl_mb( $post_id ) {
 		if ( ! $this->can_save_mb_data( 'edr_certificate_tpl', $post_id, 'edr_certificate_tpl' ) ) {
 			return;
 		}
 
+		// Save blocks.
 		if ( isset( $_POST['block_name'] ) ) {
 			$blocks = array();
 			$valid_align = array( 'L', 'C', 'R', 'J' );
@@ -195,6 +239,7 @@ class Edr_Crt_Admin {
 			update_post_meta( $post_id, '_edr_crt_blocks', $blocks );
 		}
 
+		// Save orientation.
 		$orientation = 'P';
 
 		if ( isset( $_POST['_edr_crt_orientation'] ) && in_array( $_POST['_edr_crt_orientation'], array( 'P', 'L' ) ) ) {
@@ -204,11 +249,17 @@ class Edr_Crt_Admin {
 		update_post_meta( $post_id, '_edr_crt_orientation', $orientation );
 	}
 
+	/**
+	 * Save the certificate template select meta box.
+	 *
+	 * @param int $post_id
+	 */
 	public function save_select_certificate_tpl_mb( $post_id ) {
 		if ( ! $this->can_save_mb_data( 'ib_educator_course', $post_id, 'edr_select_certificate_tpl' ) ) {
 			return;
 		}
 
+		// Save the certificate template post ID.
 		if ( isset( $_POST['_edr_crt_template'] ) ) {
 			update_post_meta( $post_id, '_edr_crt_template', intval( $_POST['_edr_crt_template'] ) );
 		}

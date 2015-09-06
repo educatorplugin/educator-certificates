@@ -1,6 +1,9 @@
 (function($) {
 	'use strict';
 
+	/**
+	 * Set certificate template background image.
+	 */
 	function setCertificateTplImage() {
 		var attachment = featuredImage.state().get('selection').first().toJSON();
 		var imageContainer = document.querySelector('#edr-crt-template > .image > div');
@@ -20,6 +23,9 @@
 		image.src = attachment.url;
 	}
 
+	/**
+	 * Remove certificate template background image.
+	 */
 	function removeCertificateTplImage() {
 		var image = document.querySelector('#edr-crt-template > .image > div > img');
 
@@ -28,6 +34,9 @@
 		}
 	}
 
+	/**
+	 * Model: TextBlock.
+	 */
 	var TextBlock = Backbone.Model.extend({
 		defaults: {
 			name: '',
@@ -41,40 +50,56 @@
 		}
 	});
 
+	/**
+	 * Collection: TextBlocks.
+	 */
 	var TextBlocks = Backbone.Collection.extend({
 		model: TextBlock
 	});
 
+	/**
+	 * View: TextBlockView.
+	 */
 	var TextBlockView = Backbone.View.extend({
 		tagName: 'li',
 		template: _.template($('#edr-text-block-tpl').html()),
 		boxEl: null,
 		className: 'edr-toggle',
-
 		events: {
 			'keyup .field-name': 'updateName',
 			'click .header': 'toggle',
 			'click .remove': 'removeBlock'
 		},
 
+		/**
+		 * Initialize.
+		 */
 		initialize: function() {
 			this.listenTo(this.model, 'change:name', this.updateBoxName);
 			this.listenTo(this.model, 'change', this.onAttrChange);
 			this.listenTo(this.model, 'destroy', this.remove);
 		},
 
+		/**
+		 * Render this view.
+		 */
 		render: function() {
 			if (this.model.get('name') === '') {
 				this.$el.addClass('open');
 			}
 
+			// Render the model.
 			this.$el.html(this.template(this.model.toJSON()));
 
+			// Set the align value.
 			this.$el.find('.field-align').val(this.model.get('align'));
 
 			this.drawBox();
 		},
 
+		/**
+		 * Render this block on the certificate background.
+		 */
 		drawBox: function() {
 			var that = this;
 
@@ -140,15 +165,28 @@
 				this.model.get('width'), this.model.get('height'));
 		},
 
+		/**
+		 * Update block name.
+		 *
+		 * @param {Object} e
+		 */
 		updateName: function(e) {
 			this.model.set('name', e.target.value);
 		},
 
+		/**
+		 * Update the block name in the UI.
+		 */
 		updateBoxName: function() {
 			this.boxEl.find('> .name').text(this.model.get('name'));
 			this.$el.find('> .header > .text').text(this.model.get('name'));
 		},
 
+		/**
+		 * Render the block attributes when they change.
+		 *
+		 * @param {TextBlock} textBlock
+		 */
 		onAttrChange: function(textBlock) {
 			this.$el.find('.field-x').val(textBlock.get('x'));
 			this.$el.find('.field-y').val(textBlock.get('y'));
@@ -159,10 +197,23 @@
 				textBlock.get('width'), textBlock.get('height'));
 		},
 
+		/**
+		 * Update the visual feedback string.
+		 *
+		 * @param {number} x
+		 * @param {number} y
+		 * @param {number} width
+		 * @param {number} height
+		 */
 		updateFeedback: function(x, y, width, height) {
 			this.boxEl.find('> .feedback').text('x' + x + ' y' + y + ' w' + width + ' h' + height);
 		},
 
+		/**
+		 * Show/hide the feedback string.
+		 *
+		 * @param {string} state
+		 */
 		toggleFeedback: function(state) {
 			var feedback = this.boxEl.find('> .feedback');
 
@@ -173,12 +224,22 @@
 			}
 		},
 
+		/**
+		 * Toggle the edit block state.
+		 *
+		 * @param {Object} e
+		 */
 		toggle: function(e) {
 			e.preventDefault();
 
 			this.$el.toggleClass('open');
 		},
 
+		/**
+		 * Remove block from UI.
+		 *
+		 * @param {Object} e
+		 */
 		removeBlock: function(e) {
 			this.boxEl.draggable('destroy');
 			this.boxEl.resizable('destroy');
@@ -189,20 +250,32 @@
 		}
 	});
 
+	/**
+	 * View: MainView.
+	 */
 	var MainView = Backbone.View.extend({
 		el: $('#edr-crt-template'),
-
 		events: {
 			'click .add-block': 'addBlock',
 			'change .change-orientation': 'changeOrientation'
 		},
 
+		/**
+		 * Initialize.
+		 */
 		initialize: function() {
 			this.collection = new TextBlocks();
 			this.listenTo(this.collection, 'add', this.renderBlock);
+
+			// Add and render existing blocks.
 			this.collection.set(edrCertBlocks);
 		},
 
+		/**
+		 * Render a block.
+		 *
+		 * @param {TextBlock} textBlock
+		 */
 		renderBlock: function(textBlock) {
 			var view = new TextBlockView({
 				model: textBlock
@@ -213,6 +286,11 @@
 			this.$el.find('.blocks').append(view.el);
 		},
 
+		/**
+		 * Add new block.
+		 *
+		 * @param {Object} e
+		 */
 		addBlock: function(e) {
 			var textBlock = new TextBlock();
 
@@ -221,6 +299,11 @@
 			e.preventDefault();
 		},
 
+		/**
+		 * Set template orientation (Portrait or Landscape).
+		 *
+		 * @param {string} orientation
+		 */
 		setOrientation: function(orientation) {
 			if (orientation === 'P') {
 				this.$el.removeClass('landscape').addClass('portrait');
@@ -229,21 +312,31 @@
 			}
 		},
 
+		/**
+		 * Change orientation based on the value of the orientation select box.
+		 *
+		 * @param {Object} e
+		 */
 		changeOrientation: function(e) {
 			this.setOrientation(e.target.value);
 		}
 	});
 
+	// Initialize the main view.
 	var mainView = new MainView();
 
 	mainView.render();
 
+	// Set the certificate image background in the UI when
+	// the featured image is added/changed.
 	var featuredImage = wp.media.featuredImage.frame();
 
 	featuredImage.on( 'select', function() {
 		setCertificateTplImage(featuredImage);
 	});
 
+	// Remove the certificate background image in the UI when
+	// the featured image is removed.
 	var removePostThumb = document.getElementById('remove-post-thumbnail');
 
 	if (removePostThumb) {

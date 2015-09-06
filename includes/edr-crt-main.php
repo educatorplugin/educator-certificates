@@ -1,10 +1,22 @@
 <?php
 
+/**
+ * The main plugin initialization class.
+ */
 class Edr_Crt_Main {
+	/**
+	 * @var string
+	 */
 	private $plugin_url;
-	private $plugin_dir;
-	private $cache;
 
+	/**
+	 * @var string
+	 */
+	private $plugin_dir;
+
+	/**
+	 * Constructor.
+	 */
 	public function __construct( $file ) {
 		$this->plugin_url = plugin_dir_url( $file );
 		$this->plugin_dir = plugin_dir_path( $file );
@@ -12,7 +24,7 @@ class Edr_Crt_Main {
 		register_activation_hook( $file, array( $this, 'plugin_activation' ) );
 		add_action( 'plugins_loaded', array( $this, 'synchronize' ) );
 		add_action( 'init', array( $this, 'register_post_types' ) );
-		add_action( 'template_redirect', array( $this, 'preview_certificate_tpl' ) );
+		add_action( 'template_redirect', array( $this, 'view_certificate' ) );
 		add_action( 'edr_entry_status_change', array( $this, 'create_certificate' ), 10, 2 );
 		add_filter( 'edr_student_courses_headings', array( $this, 'my_courses_heading' ), 10, 2 );
 		add_filter( 'edr_student_courses_values', array( $this, 'my_courses_certificate_link' ), 10, 3 );
@@ -24,6 +36,9 @@ class Edr_Crt_Main {
 		}
 	}
 
+	/**
+	 * Plugin activation listener.
+	 */
 	public function plugin_activation() {
 		global $wp_roles;
 
@@ -56,17 +71,30 @@ class Edr_Crt_Main {
 		}
 	}
 
+	/**
+	 * Get the certificates service.
+	 * This method is used by Edr_Manager only.
+	 *
+	 * @return Edr_Crt
+	 */
 	public function get_service() {
 		require $this->plugin_dir . 'includes/edr-crt.php';
 
 		return new Edr_Crt();
 	}
 
+	/**
+	 * Register the Edr_Crt service with Educator.
+	 */
 	public function synchronize() {
 		Edr_Manager::add( 'certificates', array( $this, 'get_service' ) );
 	}
 
+	/**
+	 * Register post types.
+	 */
 	public function register_post_types() {
+		// Certificate templates.
 		register_post_type(
 			'edr_certificate_tpl',
 			apply_filters( 'edr_cpt_certificate_tpl', array(
@@ -90,6 +118,7 @@ class Edr_Crt_Main {
 			) )
 		);
 
+		// Certificates.
 		register_post_type(
 			'edr_certificate',
 			apply_filters( 'edr_cpt_certificate', array(
@@ -114,7 +143,11 @@ class Edr_Crt_Main {
 		);
 	}
 
-	public function preview_certificate_tpl() {
+	/**
+	 * View certificates.
+	 * Listens to the "template_redirect" action hook.
+	 */
+	public function view_certificate() {
 		global $post;
 
 		$post_type = get_post_type();
@@ -202,6 +235,12 @@ class Edr_Crt_Main {
 		}
 	}
 
+	/**
+	 * Create a certificate.
+	 *
+	 * @param IB_Educator_Entry $entry
+	 * @param string $prev_status
+	 */
 	public function create_certificate( $entry, $prev_status ) {
 		if ( 'complete' == $entry->entry_status ) {
 			$certificates = Edr_Manager::get( 'certificates' );
@@ -212,6 +251,14 @@ class Edr_Crt_Main {
 		}
 	}
 
+	/**
+	 * Add the "Actions" column to the completed courses table
+	 * on the student's courses page.
+	 *
+	 * @param array $headings
+	 * @param string $status
+	 * @return array
+	 */
 	public function my_courses_heading( $headings, $status ) {
 		if ( 'complete' == $status && ! isset( $headings['actions'] ) ) {
 			$headings['actions'] = '<th>' . __( 'Actions', 'ibeducator' ) . '</th>';
@@ -220,6 +267,14 @@ class Edr_Crt_Main {
 		return $headings;
 	}
 
+	/**
+	 * Display the "view certificate" link in the completed courses table.
+	 *
+	 * @param array $values
+	 * @param string $status
+	 * @param IB_Educator_Entry $entry
+	 * @return array
+	 */
 	public function my_courses_certificate_link( $values, $status, $entry ) {
 		if ( 'complete' == $status ) {
 			$certificate_url = Edr_Manager::get( 'certificates' )->get_certificate_url( $entry->ID );
