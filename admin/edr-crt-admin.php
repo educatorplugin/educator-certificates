@@ -21,6 +21,8 @@ class Edr_Crt_Admin {
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ) );
 		add_action( 'save_post', array( $this, 'save_certificate_tpl_mb' ), 10 );
 		add_action( 'save_post', array( $this, 'save_select_certificate_tpl_mb' ), 10 );
+		add_action( 'manage_edr_certificate_posts_columns', array( $this, 'output_certificate_columns' ) );
+		add_action( 'manage_edr_certificate_posts_custom_column', array( $this, 'output_certificate_column_values' ), 10, 2 );
 	}
 
 	/**
@@ -190,10 +192,10 @@ class Edr_Crt_Admin {
 			'post_status' => 'publish',
 		) );
 		?>
-		<p><strong><?php _e( 'Certificate Template', 'edr-crt' ); ?></strong></p>
 		<?php if ( ! empty( $templates ) ) : ?>
 			<p>
 				<select name="_edr_crt_template">
+					<option value=""><?php _e( 'None', 'edr-crt' ); ?></option>
 					<?php
 						foreach ( $templates as $template ) {
 							$selected = ( $template_id == $template->ID ) ? ' selected="selected"' : '';
@@ -204,6 +206,8 @@ class Edr_Crt_Admin {
 					?>
 				</select>
 			</p>
+		<?php else : ?>
+			<p><?php _e( 'No certificate templates found.', 'edr-crt' ); ?></p>
 		<?php endif; ?>
 		<?php
 	}
@@ -262,6 +266,53 @@ class Edr_Crt_Admin {
 		// Save the certificate template post ID.
 		if ( isset( $_POST['_edr_crt_template'] ) ) {
 			update_post_meta( $post_id, '_edr_crt_template', intval( $_POST['_edr_crt_template'] ) );
+		}
+	}
+
+	/**
+	 * Add custom columns to the certificates list page.
+	 *
+	 * @param array $columns
+	 * @return array
+	 */
+	public function output_certificate_columns( $columns ) {
+		unset( $columns['date'] );
+
+		$columns['student'] = __( 'Student', 'edr-crt' );
+		$columns['course'] = __( 'Course', 'edr-crt' );
+		$columns['date_created'] = __( 'Date Created', 'edr-crt' );
+
+		return $columns;
+	}
+
+	/**
+	 * Output the data for the custom columns on the certificates list page.
+	 *
+	 * @param string $column
+	 * @param int $post_id
+	 * @return array
+	 */
+	public function output_certificate_column_values( $column, $post_id ) {
+		switch ( $column ) {
+			case 'student':
+				$student_id = get_post_meta( $post_id, 'student_id', true );
+
+				if ( $student_id && ( $student = get_user_by( 'id', $student_id ) ) ) {
+					echo esc_html( Edr_Manager::get( 'edr_crt' )->get_student_name( $student ) );
+				}
+				break;
+
+			case 'course':
+				$course_id = get_post_meta( $post_id, 'course_id', true );
+
+				if ( $course_id && ( $course = get_post( $course_id ) ) ) {
+					echo esc_html( $course->post_title );
+				}
+				break;
+
+			case 'date_created':
+				the_date();
+				break;
 		}
 	}
 }

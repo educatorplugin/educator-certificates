@@ -14,11 +14,15 @@
 			imageContainer.appendChild(image);
 		}
 
+		var orientation = $('select.change-orientation');
+
 		if (attachment.width > attachment.height) {
-			mainView.setOrientation('landscape');
+			orientation.val('L');
 		} else {
-			mainView.setOrientation('portrait');
+			orientation.val('P');
 		}
+
+		orientation.trigger('change');
 
 		image.src = attachment.url;
 	}
@@ -339,9 +343,9 @@
 	// the featured image is removed.
 	var removePostThumb = document.getElementById('remove-post-thumbnail');
 
-	if (removePostThumb) {
-		removePostThumb.addEventListener('click', function() {
+	document.body.addEventListener( 'click', function(e) {
+		if (e.target.getAttribute('id') === 'remove-post-thumbnail') {
 			removeCertificateTplImage();
-		}, false);
-	}
+		}
+	}, true );
 })(jQuery);

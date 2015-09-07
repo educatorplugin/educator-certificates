@@ -181,23 +181,14 @@ class Edr_Crt_Main {
 					$student = get_user_by( 'id', $entry->user_id );
 
 					if ( $crt_template && $student ) {
-						// Get blocks.
-						$blocks = get_post_meta( $crt_template, '_edr_crt_blocks', true );
-
-						// Get student name.
-						$student_name = $student->display_name;
-
-						if ( $student->first_name && $student->last_name ) {
-							$student_name = $student->first_name . ' ' . $student->last_name;
-						}
-
 						$data = array(
 							'orientation'  => get_post_meta( $crt_template, '_edr_crt_orientation', true ),
 							'image'        => get_attached_file( get_post_thumbnail_id( $crt_template ) ),
-							'student_name' => $student_name,
+							'student_name' => $edr_crt->get_student_name( $student ),
 							'course_title' => $course->post_title,
 							'date'         => date_i18n( get_option( 'date_format' ), time() ),
-							'blocks'       => $blocks,
+							'blocks'       => get_post_meta( $crt_template, '_edr_crt_blocks', true ),
+							'file_name'    => 'certificate-' . sanitize_title( $post->post_name ) . '.pdf',
 						);
 
 						$edr_crt->output_pdf( $data );
@@ -213,27 +204,19 @@ class Edr_Crt_Main {
 				wp_die( __( 'You are not allowed to view this page.', 'edr-crt' ) );
 			}
 
+			$edr_crt = Edr_Manager::get( 'edr_crt' );
 			$post_id = get_the_ID();
-
-			// Get student name.
-			$student_name = $user->display_name;
-
-			if ( $user->first_name && $user->last_name ) {
-				$student_name = $user->first_name . ' ' . $user->last_name;
-			}
-
-			$image_path = get_attached_file( get_post_thumbnail_id( $post_id ) );
-			
 			$data = array(
 				'orientation'  => get_post_meta( $post_id, '_edr_crt_orientation', true ),
-				'image'        => $image_path,
-				'course_title' => 'Example Course',
-				'student_name' => $student_name,
+				'image'        => get_attached_file( get_post_thumbnail_id( $post_id ) ),
+				'course_title' => __( 'Course Title', 'edr-crt' ),
+				'student_name' => $edr_crt->get_student_name( $user ),
 				'date'         => date_i18n( get_option( 'date_format' ), time() ),
 				'blocks'       => get_post_meta( $post_id, '_edr_crt_blocks', true ),
+				'file_name'    => 'preview-certificate-' . $post_id . '.pdf',
 			);
-			
-			Edr_Manager::get( 'edr_crt' )->output_pdf( $data );
+
+			$edr_crt->output_pdf( $data );
 
 			exit();
 		}
@@ -246,13 +229,21 @@ class Edr_Crt_Main {
 	 * @param string $prev_status
 	 */
 	public function create_certificate( $entry, $prev_status ) {
-		if ( 'complete' == $entry->entry_status ) {
-			$edr_crt = Edr_Manager::get( 'edr_crt' );
-			$certificate = $edr_crt->get_certificate_by_entry_id( $entry->ID );
+		// Is the entry completed?
+		if ( 'complete' != $entry->entry_status ) {
+			return;
+		}
 
-			if ( is_null( $certificate ) ) {
-				$edr_crt->create_certificate( $entry );
-			}
+		// Can the certificate be created?
+		if ( ! apply_filters( 'edr_crt_can_create', true, $entry ) ) {
+			return;
+		}
+
+		$edr_crt = Edr_Manager::get( 'edr_crt' );
+		$certificate = $edr_crt->get_certificate_by_entry_id( $entry->ID );
+
+		if ( is_null( $certificate ) ) {
+			$edr_crt->create_certificate( $entry );
 		}
 	}
 
@@ -284,8 +275,14 @@ class Edr_Crt_Main {
 		if ( 'complete' == $status ) {
 			$certificate_url = Edr_Manager::get( 'edr_crt' )->get_certificate_url( $entry->ID );
 
-			if ( ! isset( $values['actions'] ) ) {
-				$values['actions'] = '<td><a href="' . esc_url( $certificate_url ) . '" target="_blank">' . __( 'View Certificate', 'edr-crt' ) . '</a></td>';
+			if ( ! empty( $certificate_url ) ) {
+				if ( ! isset( $values['actions'] ) ) {
+					$values['actions'] = '<td><a href="' . esc_url( $certificate_url ) . '" target="_blank">' . __( 'View Certificate', 'edr-crt' ) . '</a></td>';
+				}
+			} else {
+				if ( ! isset( $values['actions'] ) ) {
+					$values['actions'] = '<td></td>';
+				}
 			}
 		}
 

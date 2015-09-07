@@ -51,7 +51,7 @@ class Edr_Crt {
 			$pdf->MultiCell( $width, $line_height_mm, str_replace( $search, $replace, $block['content'] ), 0, $align, false );
 		}
 
-		$pdf->Output();
+		$pdf->Output( $data['file_name'], 'I' );
 	}
 
 	/**
@@ -74,10 +74,28 @@ class Edr_Crt {
 		$crt_id = wp_insert_post( $args );
 
 		if ( $crt_id ) {
+			update_post_meta( $crt_id, 'student_id', $entry->user_id );
+			update_post_meta( $crt_id, 'course_id', $entry->course_id );
 			update_post_meta( $crt_id, 'entry_id', $entry->ID );
 		}
 
 		return $crt_id;
+	}
+
+	/**
+	 * Get student name.
+	 *
+	 * @param WP_User $student
+	 * @return string
+	 */
+	public function get_student_name( $student ) {
+		$student_name = $student->display_name;
+
+		if ( $student->first_name && $student->last_name ) {
+			$student_name = $student->first_name . ' ' . $student->last_name;
+		}
+
+		return $student_name;
 	}
 
 	/**
@@ -126,10 +144,11 @@ class Edr_Crt {
 	 * @return boolean
 	 */
 	public function can_view_certificate( $certificate ) {
-		$user = wp_get_current_user();
 		$can_view = false;
+		$user = wp_get_current_user();
+		$student_id = get_post_meta( $certificate->ID, 'student_id', true );
 
-		if ( $certificate->post_author == $user->ID ) {
+		if ( $student_id == $user->ID || current_user_can( 'administrator' ) ) {
 			$can_view = true;
 		}
 
