@@ -210,7 +210,8 @@
 		 * @param {number} height
 		 */
 		updateFeedback: function(x, y, width, height) {
-			this.boxEl.find('> .feedback').text('x' + x + ' y' + y + ' w' + (width + 2) + ' h' + (height + 2));
+			this.boxEl.find('> .feedback').text('x' + Math.round(x) + ' y' + Math.round(y) + ' w' +
+				(Math.round(width) + 2) + ' h' + (Math.round(height) + 2));
 		},
 
 		/**

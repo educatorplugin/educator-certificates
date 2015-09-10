@@ -257,6 +257,11 @@ class Edr_Crt_Main {
 			return;
 		}
 
+		// Does the course have a certificate template set?
+		if ( ! get_post_meta( $entry->course_id, '_edr_crt_template', true ) ) {
+			return;
+		}
+
 		// Can the certificate be created?
 		if ( ! apply_filters( 'edr_crt_can_create', true, $entry ) ) {
 			return;
