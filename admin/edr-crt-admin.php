@@ -103,24 +103,43 @@ class Edr_Crt_Admin {
 		wp_nonce_field( 'edr_certificate_tpl', 'edr_certificate_tpl_nonce' );
 
 		$blocks = get_post_meta( $post->ID, '_edr_crt_blocks', true );
+
 		$orientation = get_post_meta( $post->ID, '_edr_crt_orientation', true );
 		$orientations = array(
 			'P' => __( 'Portrait', 'edr-crt' ),
 			'L' => __( 'Landscape', 'edr-crt' ),
 		);
+
+		$page_size = get_post_meta( $post->ID, '_edr_crt_size', true );
+		$page_sizes = Edr_Manager::get( 'edr_crt' )->get_page_sizes();
 		?>
-		<div id="edr-crt-template" class="<?php echo ( 'L' == $orientation ) ? 'landscape' : 'portrait'; ?>">
-			<p>
-				<strong><?php _e( 'Orientation', 'edr-crt' ); ?></strong>
-				<select class="change-orientation" name="_edr_crt_orientation">
-					<?php
-						foreach ( $orientations as $key => $title ) {
-							$selected = ( $key == $orientation ) ? ' selected="selected"' : '';
-							echo '<option value="' . $key . '"' . $selected . '>' . $title . '</option>';
-						}
-					?>
-				</select>
-			</p>
+		<div id="edr-crt-template">
+			<div class="edr-form-blocks">
+				<div class="block">
+					<label><?php _e( 'Page Size', 'edr-crt' ); ?></label>
+					<select class="change-page-size" name="_edr_crt_size">
+						<?php
+							foreach ( $page_sizes as $key => $size ) {
+								$selected = ( $key == $page_size ) ? ' selected="selected"' : '';
+								echo '<option value="' . esc_attr( $key ) . '" data-width="' . (float) $size['width'] . '"'
+									. ' data-height="' . (float) $size['height'] . '"' . $selected . '>'
+									. esc_html( $size['label'] ) . '</option>';
+							}
+						?>
+					</select>
+				</div>
+				<div class="block">
+					<label><?php _e( 'Orientation', 'edr-crt' ); ?></label>
+					<select class="change-orientation" name="_edr_crt_orientation">
+						<?php
+							foreach ( $orientations as $key => $title ) {
+								$selected = ( $key == $orientation ) ? ' selected="selected"' : '';
+								echo '<option value="' . $key . '"' . $selected . '>' . $title . '</option>';
+							}
+						?>
+					</select>
+				</div>
+			</div>
 			<div class="image">
 				<div>
 					<?php
@@ -242,6 +261,16 @@ class Edr_Crt_Admin {
 
 			update_post_meta( $post_id, '_edr_crt_blocks', $blocks );
 		}
+
+		// Save page size.
+		$page_size = 'a4';
+		$page_sizes = Edr_Manager::get( 'edr_crt' )->get_page_sizes();
+
+		if ( isset( $_POST['_edr_crt_size'] ) && array_key_exists( $_POST['_edr_crt_size'], $page_sizes ) ) {
+			$page_size = $_POST['_edr_crt_size'];
+		}
+
+		update_post_meta( $post_id, '_edr_crt_size', $page_size );
 
 		// Save orientation.
 		$orientation = 'P';

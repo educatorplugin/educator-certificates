@@ -5,6 +5,26 @@
  */
 class Edr_Crt {
 	/**
+	 * Get page sizes.
+	 *
+	 * @return array
+	 */
+	public function get_page_sizes() {
+		return apply_filters( 'edr_crt_page_sizes', array(
+			'a4' => array(
+				'label'  => __( 'A4', 'edr-crt' ),
+				'width'  => 595,
+				'height' => 842,
+			),
+			'letter' => array(
+				'label'  => __( 'Letter', 'edr-crt' ),
+				'width'  => 612,
+				'height' => 792,
+			),
+		) );
+	}
+
+	/**
 	 * Output the certificate PDF.
 	 *
 	 * @param array $data Certificate data.
@@ -16,17 +36,17 @@ class Edr_Crt {
 			$data['orientation'] = 'P';
 		}
 
-		$pdf = new TFPDF( $data['orientation'] );
+		$pdf = new TFPDF( $data['orientation'], 'pt', $data['page_size'] );
 		$pdf->SetAutoPageBreak( false );
 		$pdf->AddPage();
 		$pdf->SetFont( 'helvetica', '', 12 );
 
-		$w = 210;
-		$h = 297;
+		$w = $data['page_size'][0];
+		$h = $data['page_size'][1];
 
 		if ( 'L' == $data['orientation'] ) {
-			$w = 297;
-			$h = 210;
+			$w = $data['page_size'][1];
+			$h = $data['page_size'][0];
 		}
 
 		$pdf->Image( $data['image'], 0, 0, $w, $h, '', '' );
@@ -38,13 +58,13 @@ class Edr_Crt {
 		$valid_align = array( 'L', 'C', 'R', 'J' );
 
 		foreach ( $data['blocks'] as $block ) {
-			$x = $block['x'] * 25.4 / 72;
-			$y = $block['y'] * 25.4 / 72;
-			$width = $block['width'] * 25.4 / 72;
-			$height = $block['height'] * 25.4 / 72;
+			$x = $block['x'];
+			$y = $block['y'];
+			$width = $block['width'];
+			$height = $block['height'];
 			$align = in_array( $block['align'], $valid_align ) ? $block['align'] : 'L';
 			$font_size_pt = $block['font_size'];
-			$line_height_mm = $font_size_pt / 72 * 25.4 * $line_height;
+			$line_height_mm = $font_size_pt * $line_height;
 
 			$pdf->SetFontSize( $font_size_pt );
 			$pdf->SetXY( $x, $y );

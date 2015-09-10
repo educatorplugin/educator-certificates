@@ -1,6 +1,9 @@
 <?php
 
 class EdrCrtTest extends WP_UnitTestCase {
+	/**
+	 * Test the "create_certificate" method.
+	 */
 	public function testCreateCertificate() {
 		$edr_crt_test = Edr_Crt_Test::get_instance();
 		$course = get_post( $edr_crt_test->addCourse() );
@@ -19,6 +22,9 @@ class EdrCrtTest extends WP_UnitTestCase {
 		$this->assertEquals( $entry->ID, get_post_meta( $certificate_id, 'entry_id', true ) );
 	}
 
+	/**
+	 * Test the "get_student_name" method.
+	 */
 	public function testGetStudentName() {
 		$edr_crt = Edr_Manager::get( 'edr_crt' );
 		$student = get_user_by( 'id', 1 );
@@ -34,6 +40,9 @@ class EdrCrtTest extends WP_UnitTestCase {
 		$this->assertEquals( 'FirstName LastName', $edr_crt->get_student_name( $student ) );
 	}
 
+	/**
+	 * Test the "get_certificate_by_entry_id" method.
+	 */
 	public function testGetCertificateByEntryId() {
 		$entry = Edr_Crt_Test::get_instance()->addEntry( array(
 			'user_id'      => 1,
@@ -47,6 +56,9 @@ class EdrCrtTest extends WP_UnitTestCase {
 		$this->assertEquals( $certificate_id, $edr_crt->get_certificate_by_entry_id( $entry->ID )->ID );
 	}
 
+	/**
+	 * Test the "get_certificate_url" method.
+	 */
 	public function testGetCertificateUrl() {
 		$entry = Edr_Crt_Test::get_instance()->addEntry( array(
 			'user_id'      => 1,
@@ -60,6 +72,9 @@ class EdrCrtTest extends WP_UnitTestCase {
 		$this->assertEquals( get_permalink( $certificate_id ), $edr_crt->get_certificate_url( $entry->ID ) );
 	}
 
+	/**
+	 * Test the "can_view_certificate" method.
+	 */
 	public function testCanViewCertificate() {
 		global $current_user;
 

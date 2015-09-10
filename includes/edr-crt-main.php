@@ -181,6 +181,16 @@ class Edr_Crt_Main {
 					$student = get_user_by( 'id', $entry->user_id );
 
 					if ( $crt_template && $student ) {
+						// Get page size.
+						$page_size = get_post_meta( $crt_template, '_edr_crt_size', true );
+						$page_sizes = $edr_crt->get_page_sizes();
+
+						if ( array_key_exists( $page_size, $page_sizes ) ) {
+							$page_size = array( $page_sizes[ $page_size ]['width'], $page_sizes[ $page_size ]['height'] );
+						} else {
+							$page_size = 'a4';
+						}
+
 						$data = array(
 							'orientation'  => get_post_meta( $crt_template, '_edr_crt_orientation', true ),
 							'image'        => get_attached_file( get_post_thumbnail_id( $crt_template ) ),
@@ -189,6 +199,7 @@ class Edr_Crt_Main {
 							'date'         => date_i18n( get_option( 'date_format' ), time() ),
 							'blocks'       => get_post_meta( $crt_template, '_edr_crt_blocks', true ),
 							'file_name'    => 'certificate-' . sanitize_title( $post->post_name ) . '.pdf',
+							'page_size'    => $page_size,
 						);
 
 						$edr_crt->output_pdf( $data );
@@ -204,8 +215,19 @@ class Edr_Crt_Main {
 				wp_die( __( 'You are not allowed to view this page.', 'edr-crt' ) );
 			}
 
-			$edr_crt = Edr_Manager::get( 'edr_crt' );
 			$post_id = get_the_ID();
+			$edr_crt = Edr_Manager::get( 'edr_crt' );
+
+			// Get page size.
+			$page_size = get_post_meta( $post_id, '_edr_crt_size', true );
+			$page_sizes = $edr_crt->get_page_sizes();
+
+			if ( array_key_exists( $page_size, $page_sizes ) ) {
+				$page_size = array( $page_sizes[ $page_size ]['width'], $page_sizes[ $page_size ]['height'] );
+			} else {
+				$page_size = 'a4';
+			}
+
 			$data = array(
 				'orientation'  => get_post_meta( $post_id, '_edr_crt_orientation', true ),
 				'image'        => get_attached_file( get_post_thumbnail_id( $post_id ) ),
@@ -214,6 +236,7 @@ class Edr_Crt_Main {
 				'date'         => date_i18n( get_option( 'date_format' ), time() ),
 				'blocks'       => get_post_meta( $post_id, '_edr_crt_blocks', true ),
 				'file_name'    => 'preview-certificate-' . $post_id . '.pdf',
+				'page_size'    => $page_size,
 			);
 
 			$edr_crt->output_pdf( $data );

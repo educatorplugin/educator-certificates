@@ -146,13 +146,13 @@
 					that.boxEl.off('mouseleave', onMouseLeave);
 				},
 				stop: function(event, ui) {
-					that.model.set('width', ui.size.width + 4);
-					that.model.set('height', ui.size.height + 4);
+					that.model.set('width', ui.size.width);
+					that.model.set('height', ui.size.height);
 					that.boxEl.hover(onMouseEnter, onMouseLeave);
 				},
 				resize: function(event, ui) {
 					that.updateFeedback(that.model.attributes.x, that.model.attributes.y,
-						ui.size.width + 4, ui.size.height + 4);
+						ui.size.width, ui.size.height);
 				}
 			});
 			
@@ -210,7 +210,7 @@
 		 * @param {number} height
 		 */
 		updateFeedback: function(x, y, width, height) {
-			this.boxEl.find('> .feedback').text('x' + x + ' y' + y + ' w' + width + ' h' + height);
+			this.boxEl.find('> .feedback').text('x' + x + ' y' + y + ' w' + (width + 2) + ' h' + (height + 2));
 		},
 
 		/**
@@ -258,9 +258,12 @@
 	 * View: MainView.
 	 */
 	var MainView = Backbone.View.extend({
+		sizeName: 'a4',
+		orientation: 'P',
 		el: $('#edr-crt-template'),
 		events: {
 			'click .add-block': 'addBlock',
+			'change .change-page-size': 'changePageSize',
 			'change .change-orientation': 'changeOrientation'
 		},
 
@@ -268,7 +271,31 @@
 		 * Initialize.
 		 */
 		initialize: function() {
+			// Set size.
+			var sizeSelect = this.$el.find('select.change-page-size');
+			var sizeName = sizeSelect.val();
+			var sizeOption;
+
+			if (sizeName !== '') {
+				this.sizeName = sizeName;
+			}
+
+			sizeOption = sizeSelect.find('option[value="' + this.sizeName + '"]');
+			this.setPageSize(this.sizeName, sizeOption.data('width'), sizeOption.data('height'));
+
+			// Set orientation.
+			var orientation = this.$el.find('select.change-orientation').val();
+
+			if (orientation !== '') {
+				this.orientation = orientation;
+			}
+
+			this.setOrientation(this.orientation);
+
+			// Create text blocks collection.
 			this.collection = new TextBlocks();
+
+			// Render text block when added to the collection.
 			this.listenTo(this.collection, 'add', this.renderBlock);
 
 			// Add and render existing blocks.
@@ -304,16 +331,64 @@
 		},
 
 		/**
+		 * Set template size.
+		 *
+		 * @param {string} sizeName
+		 * @param {number} width
+		 * @param {number} height
+		 */
+		setPageSize: function(sizeName, width, height) {
+			if (this.orientation === 'L') {
+				this.$el.find('> .image > div').css({
+					width: height + 'px',
+					height: width + 'px'
+				});
+			} else {
+				this.$el.find('> .image > div').css({
+					width: width + 'px',
+					height: height + 'px'
+				});
+			}
+
+			this.$el.removeClass('size-' + this.sizeName).addClass('size-' + sizeName);
+			this.sizeName = sizeName;
+		},
+
+		/**
+		 * Change template size based on the value of the page size select box.
+		 *
+		 * @param {Object} e
+		 */
+		changePageSize: function(e) {
+			var sizeName = e.target.value;
+			var option = e.target.querySelector('option[value="' + sizeName + '"]');
+			var width = option.getAttribute('data-width');
+			var height = option.getAttribute('data-height');
+
+			this.setPageSize(sizeName, width, height);
+		},
+
+		/**
 		 * Set template orientation (Portrait or Landscape).
 		 *
 		 * @param {string} orientation
 		 */
 		setOrientation: function(orientation) {
-			if (orientation === 'P') {
-				this.$el.removeClass('landscape').addClass('portrait');
-			} else {
-				this.$el.removeClass('portrait').addClass('landscape');
+			var imageContainer = this.$el.find('> .image > div');
+			var width = imageContainer.width();
+			var height = imageContainer.height();
+			var curClass = (this.orientation === 'P') ? 'portrait' : 'landscape';
+			var newClass = (orientation === 'P') ? 'portrait' : 'landscape';
+
+			if ((orientation === 'P' && width > height) || (orientation === 'L' && height > width)) {
+				imageContainer.css({
+					width: height + 'px',
+					height: width + 'px',
+				});
 			}
+
+			this.$el.removeClass(curClass).addClass(newClass);
+			this.orientation = orientation;
 		},
 
 		/**
