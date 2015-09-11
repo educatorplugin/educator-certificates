@@ -12,7 +12,7 @@ This plugin adds the certificates functionality to the Educator plugin.
 
 == Description ==
 
-This plugin requires the <a href="https://wordpress.org/plugins/ibeducator/">Educator plugin</a> 1.7 or higher.
+This plugin requires the <a href="https://wordpress.org/plugins/ibeducator/">Educator plugin</a> 1.6 or higher.
 
 == Installation ==
 

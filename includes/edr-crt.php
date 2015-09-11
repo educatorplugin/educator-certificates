@@ -130,7 +130,7 @@ class Edr_Crt {
 			'post_status'    => 'publish',
 			'posts_per_page' => 1,
 			'meta_query'     => array(
-				array( 'value' => $entry_id ),
+				array( 'key' => 'entry_id', 'value' => $entry_id ),
 			),
 		) );
 

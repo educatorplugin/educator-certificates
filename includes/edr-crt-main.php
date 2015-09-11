@@ -48,25 +48,28 @@ class Edr_Crt_Main {
 
 		// Add capabilities.
 		if ( isset( $wp_roles ) && is_object( $wp_roles ) ) {
-			$post_type = 'edr_certificate_tpl';
-			$admin_caps = array(
-				"edit_{$post_type}",
-				"read_{$post_type}",
-				"delete_{$post_type}",
-				"edit_{$post_type}s",
-				"edit_others_{$post_type}s",
-				"publish_{$post_type}s",
-				"read_private_{$post_type}s",
-				"delete_{$post_type}s",
-				"delete_private_{$post_type}s",
-				"delete_published_{$post_type}s",
-				"delete_others_{$post_type}s",
-				"edit_private_{$post_type}s",
-				"edit_published_{$post_type}s",
-			);
+			$post_types = array( 'edr_certificate_tpl', 'edr_certificate' );
 
-			foreach ( $admin_caps as $cap ) {
-				$wp_roles->add_cap( 'administrator', $cap );
+			foreach ( $post_types as $post_type ) {
+				$admin_caps = array(
+					"edit_{$post_type}",
+					"read_{$post_type}",
+					"delete_{$post_type}",
+					"edit_{$post_type}s",
+					"edit_others_{$post_type}s",
+					"publish_{$post_type}s",
+					"read_private_{$post_type}s",
+					"delete_{$post_type}s",
+					"delete_private_{$post_type}s",
+					"delete_published_{$post_type}s",
+					"delete_others_{$post_type}s",
+					"edit_private_{$post_type}s",
+					"edit_published_{$post_type}s",
+				);
+
+				foreach ( $admin_caps as $cap ) {
+					$wp_roles->add_cap( 'administrator', $cap );
+				}
 			}
 		}
 	}
