@@ -12,7 +12,9 @@ This plugin adds the certificates functionality to the Educator plugin.
 
 == Description ==
 
-This plugin requires the <a href="https://wordpress.org/plugins/ibeducator/">Educator plugin</a> 1.6 or higher.
+This plugin requires the <a href="https://wordpress.org/plugins/ibeducator/">Educator plugin</a> 1.6 or greater.
+
+An admin will be able to setup PDF certificate templates and assign them to various courses. Then, when the entry status changes to "Complete" certificates are issued automatically. A student will see links to his/her certificates on "My Courses" page.
 
 == Installation ==
 
