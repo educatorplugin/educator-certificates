@@ -74,8 +74,7 @@ class Edr_Crt_Bootstrap_Tests {
 	 */
 	public function install_plugins() {
 		// Educator.
-		require_once IBEDUCATOR_PLUGIN_DIR . 'includes/ib-educator-install.php';
-		$install = new IB_Educator_Install();
+		$install = new Edr_Install();
 		$install->activate();
 	}
 }
