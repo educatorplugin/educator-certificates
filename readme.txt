@@ -1,18 +1,17 @@
 === Educator Certificates ===
 Contributors: educatorteam
-Donate link: http://educatorplugin.com
 Tags: learning management system, lms, learning, online courses
 Requires at least: 4.3
 Tested up to: 4.3
-Stable tag: 0.1
+Stable tag: 0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-This plugin adds the certificates functionality to the Educator plugin.
+This plugin adds the certificates feature to the Educator plugin.
 
 == Description ==
 
-This plugin requires the <a href="https://wordpress.org/plugins/ibeducator/">Educator plugin</a> 1.6 or greater.
+This plugin requires the <a href="https://wordpress.org/plugins/ibeducator/">Educator plugin</a> 1.7 or greater.
 
 An admin will be able to setup PDF certificate templates and assign them to various courses. Then, when the entry status changes to "Complete" certificates are issued automatically. A student will see links to his/her certificates on "My Courses" page.
 
@@ -22,6 +21,11 @@ An admin will be able to setup PDF certificate templates and assign them to vari
 2. Activate the plugin through the 'Plugins' menu in WordPress
 
 == Changelog ==
+
+= 0.2 =
+
+* Added Educator 1.7+ support
+* Requires Educator 1.7+
 
 = 0.1 =
 

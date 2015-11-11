@@ -4,4 +4,4 @@ This is a WordPress plugin that adds the certificates feature to the [Educator p
 
 ## Pull Requests
 
-When creating pull requests, please set the base(destination) branch to "development".
+When creating a pull request, please set the base(destination) branch to "develop".

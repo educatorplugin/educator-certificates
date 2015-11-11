@@ -24,7 +24,7 @@ class Edr_Crt_Test {
 	}
 
 	public function addEntry( $data ) {
-		$entry = IB_Educator_Entry::get_instance();
+		$entry = edr_get_entry();
 		$entry->course_id = $data['course_id'];
 		$entry->user_id = $data['user_id'];
 		$entry->entry_status = $data['entry_status'];

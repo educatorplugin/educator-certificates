@@ -170,9 +170,9 @@ class Edr_Crt_Main {
 			$custom = get_post_custom( $post->ID );
 
 			// Get entry.
-			$entry = IB_Educator_Entry::get_instance( $custom['entry_id'][0] );
+			$entry = edr_get_entry( $custom['entry_id'][0] );
 
-			if ( $entry ) {
+			if ( $entry->ID ) {
 				// Get course.
 				$course = get_post( $entry->course_id );
 
