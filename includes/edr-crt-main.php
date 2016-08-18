@@ -7,12 +7,12 @@ class Edr_Crt_Main {
 	/**
 	 * @var string
 	 */
-	private $plugin_url;
+	protected $plugin_url;
 
 	/**
 	 * @var string
 	 */
-	private $plugin_dir;
+	protected $plugin_dir;
 
 	/**
 	 * Constructor.
@@ -75,32 +75,23 @@ class Edr_Crt_Main {
 	}
 
 	/**
-	 * Get the certificates service.
-	 * This method is used by Edr_Manager only.
-	 *
-	 * @return Edr_Crt
-	 */
-	public function get_service() {
-		require $this->plugin_dir . 'includes/edr-crt.php';
-
-		return new Edr_Crt();
-	}
-
-	/**
 	 * Various processing on plugins loaded.
 	 */
 	public function on_plugins_loaded() {
 		// Load plugin text domain.
 		load_plugin_textdomain( 'edr-crt', false, 'educator-certificates/languages' );
 
-		// Register the Edr_Crt service with Educator.
-		Edr_Manager::add( 'edr_crt', array( $this, 'get_service' ) );
+		if ( ! defined( 'EDR_VERSION' ) ) {
+			Edr_Manager::add( 'edr_crt', array( 'Edr_Crt', 'get_instance' ) );
+		}
 	}
 
 	/**
 	 * Register post types.
 	 */
 	public function register_post_types() {
+		$parent_menu_name = defined( 'EDR_VERSION' ) ? 'edr_admin_settings' : 'ib_educator_admin';
+
 		// Certificate templates.
 		register_post_type(
 			'edr_certificate_tpl',
@@ -113,7 +104,7 @@ class Edr_Crt_Main {
 				'public'             => true,
 				'publicly_queryable' => true,
 				'show_ui'            => true,
-				'show_in_menu'       => 'ib_educator_admin',
+				'show_in_menu'       => $parent_menu_name,
 				'show_in_admin_bar'  => false,
 				'capability_type'    => 'edr_certificate_tpl',
 				'map_meta_cap'       => true,
@@ -137,7 +128,7 @@ class Edr_Crt_Main {
 				'public'             => true,
 				'publicly_queryable' => true,
 				'show_ui'            => true,
-				'show_in_menu'       => 'ib_educator_admin',
+				'show_in_menu'       => $parent_menu_name,
 				'show_in_admin_bar'  => false,
 				'capability_type'    => 'edr_certificate',
 				'map_meta_cap'       => true,
@@ -160,7 +151,7 @@ class Edr_Crt_Main {
 		$post_type = get_post_type();
 
 		if ( 'edr_certificate' == $post_type ) {
-			$edr_crt = Edr_Manager::get( 'edr_crt' );
+			$edr_crt = Edr_Crt::get_instance();
 
 			// Check permission.
 			if ( ! $edr_crt->can_view_certificate( $post ) ) {
@@ -219,7 +210,7 @@ class Edr_Crt_Main {
 			}
 
 			$post_id = get_the_ID();
-			$edr_crt = Edr_Manager::get( 'edr_crt' );
+			$edr_crt = Edr_Crt::get_instance();
 
 			// Get page size.
 			$page_size = get_post_meta( $post_id, '_edr_crt_size', true );
@@ -251,7 +242,7 @@ class Edr_Crt_Main {
 	/**
 	 * Create a certificate.
 	 *
-	 * @param IB_Educator_Entry $entry
+	 * @param Edr_Entry $entry
 	 * @param string $prev_status
 	 */
 	public function create_certificate( $entry, $prev_status ) {
@@ -270,7 +261,7 @@ class Edr_Crt_Main {
 			return;
 		}
 
-		$edr_crt = Edr_Manager::get( 'edr_crt' );
+		$edr_crt = Edr_Crt::get_instance();
 		$certificate = $edr_crt->get_certificate_by_entry_id( $entry->ID );
 
 		if ( is_null( $certificate ) ) {
@@ -299,12 +290,12 @@ class Edr_Crt_Main {
 	 *
 	 * @param array $values
 	 * @param string $status
-	 * @param IB_Educator_Entry $entry
+	 * @param Edr_Entry $entry
 	 * @return array
 	 */
 	public function my_courses_certificate_link( $values, $status, $entry ) {
 		if ( 'complete' == $status ) {
-			$certificate_url = Edr_Manager::get( 'edr_crt' )->get_certificate_url( $entry->ID );
+			$certificate_url = Edr_Crt::get_instance()->get_certificate_url( $entry->ID );
 
 			if ( ! empty( $certificate_url ) ) {
 				if ( ! isset( $values['actions'] ) ) {

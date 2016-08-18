@@ -5,7 +5,7 @@ Plugin URI: http://educatorplugin.com/add-ons/educator-certificates/
 Description: Adds the certificates feature to the Educator plugin
 Author: educatorteam
 Author URI: http://educatorplugin.com/
-Version: 0.2
+Version: 0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: edr-crt
@@ -31,6 +31,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 if ( ! defined( 'ABSPATH' ) ) exit();
 
+require 'includes/edr-crt.php';
 require 'includes/edr-crt-main.php';
 
 new Edr_Crt_Main( __FILE__ );

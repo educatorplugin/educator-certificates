@@ -5,6 +5,24 @@
  */
 class Edr_Crt {
 	/**
+	 * @var Edr_Crt
+	 */
+	protected static $instance = null;
+
+	/**
+	 * Get the single instance of this class.
+	 *
+	 * @return Edr_Crt
+	 */
+	public static function get_instance() {
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
+		}
+
+		return self::$instance;
+	}
+
+	/**
 	 * Get page sizes.
 	 *
 	 * @return array

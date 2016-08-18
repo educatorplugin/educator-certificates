@@ -10,6 +10,11 @@ class Edr_Crt_Admin {
 	private $plugin_url;
 
 	/**
+	 * @var string
+	 */
+	private $pt_course;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param string $plugin_url
@@ -17,12 +22,20 @@ class Edr_Crt_Admin {
 	public function __construct( $plugin_url ) {
 		$this->plugin_url = $plugin_url;
 
+		add_action( 'plugins_loaded', array( $this, 'initialize' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ) );
 		add_action( 'save_post', array( $this, 'save_certificate_tpl_mb' ), 10 );
 		add_action( 'save_post', array( $this, 'save_select_certificate_tpl_mb' ), 10 );
 		add_action( 'manage_edr_certificate_posts_columns', array( $this, 'output_certificate_columns' ) );
 		add_action( 'manage_edr_certificate_posts_custom_column', array( $this, 'output_certificate_column_values' ), 10, 2 );
+	}
+
+	/**
+	 * Initialize.
+	 */
+	public function initialize() {
+		$this->pt_course = defined( 'EDR_VERSION' ) ? EDR_PT_COURSE : 'ib_educator_course';
 	}
 
 	/**
@@ -90,7 +103,7 @@ class Edr_Crt_Admin {
 			'edr_select_certificate_tpl',
 			__( 'Certificate Template', 'edr-crt' ),
 			array( $this, 'select_certificate_tpl_mb' ),
-			'ib_educator_course'
+			$this->pt_course
 		);
 	}
 
@@ -111,7 +124,7 @@ class Edr_Crt_Admin {
 		);
 
 		$page_size = get_post_meta( $post->ID, '_edr_crt_size', true );
-		$page_sizes = Edr_Manager::get( 'edr_crt' )->get_page_sizes();
+		$page_sizes = Edr_Crt::get_instance()->get_page_sizes();
 		?>
 		<div id="edr-crt-template">
 			<div class="edr-form-blocks">
@@ -264,7 +277,7 @@ class Edr_Crt_Admin {
 
 		// Save page size.
 		$page_size = 'a4';
-		$page_sizes = Edr_Manager::get( 'edr_crt' )->get_page_sizes();
+		$page_sizes = Edr_Crt::get_instance()->get_page_sizes();
 
 		if ( isset( $_POST['_edr_crt_size'] ) && array_key_exists( $_POST['_edr_crt_size'], $page_sizes ) ) {
 			$page_size = $_POST['_edr_crt_size'];
@@ -288,7 +301,7 @@ class Edr_Crt_Admin {
 	 * @param int $post_id
 	 */
 	public function save_select_certificate_tpl_mb( $post_id ) {
-		if ( ! $this->can_save_mb_data( 'ib_educator_course', $post_id, 'edr_select_certificate_tpl' ) ) {
+		if ( ! $this->can_save_mb_data( $this->pt_course, $post_id, 'edr_select_certificate_tpl' ) ) {
 			return;
 		}
 
@@ -327,7 +340,7 @@ class Edr_Crt_Admin {
 				$student_id = get_post_meta( $post_id, 'student_id', true );
 
 				if ( $student_id && ( $student = get_user_by( 'id', $student_id ) ) ) {
-					echo esc_html( Edr_Manager::get( 'edr_crt' )->get_student_name( $student ) );
+					echo esc_html( Edr_Crt::get_instance()->get_student_name( $student ) );
 				}
 				break;
 
